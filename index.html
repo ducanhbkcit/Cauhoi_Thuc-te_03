@@ -3,373 +3,522 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hệ thống thu thập câu trả lời</title>
+  <title>Phiếu nhập thông tin</title>
+  <meta name="description" content="Biểu mẫu thu thập thông tin và gửi dữ liệu về Google Sheet qua Apps Script." />
   <style>
     :root{
-      --bg1:#0f172a;
-      --bg2:#111827;
+      --bg1:#f4f8ff;
+      --bg2:#eaf1fb;
       --card:#ffffff;
-      --text:#0f172a;
-      --muted:#475569;
-      --line:#dbeafe;
+      --line:#d7e3f1;
+      --text:#17324d;
+      --muted:#5b7188;
       --primary:#1d4ed8;
-      --primary2:#2563eb;
-      --danger:#b91c1c;
-      --ok:#166534;
-      --shadow:0 20px 50px rgba(15,23,42,.18);
-      --radius:18px;
+      --primary-dark:#163ea8;
+      --danger:#c62828;
+      --success:#0f766e;
+      --warning:#b7791f;
+      --shadow:0 18px 45px rgba(15,23,42,.10);
+      --radius:22px;
     }
+
     *{box-sizing:border-box}
-    body{
+
+    html,body{
       margin:0;
-      font-family:Arial, Helvetica, sans-serif;
+      padding:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(37,99,235,.25), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(59,130,246,.18), transparent 25%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
-      color:#fff;
-      min-height:100vh;
+        radial-gradient(circle at top left, rgba(29,78,216,.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(15,118,110,.10), transparent 24%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
     }
-    .wrap{
-      max-width:1100px;
+
+    body{min-height:100vh}
+
+    .container{
+      width:min(100%, 1080px);
       margin:0 auto;
-      padding:32px 16px 40px;
+      padding:18px;
     }
-    .banner{
-      text-align:center;
-      margin-bottom:24px;
+
+    .hero{
+      background:linear-gradient(135deg,#143a78 0%, #1d4ed8 60%, #0f766e 100%);
+      color:#fff;
+      border-radius:28px;
+      padding:28px 22px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
     }
-    .banner h1{
-      margin:0 0 8px;
-      font-size:32px;
+
+    .hero::before,
+    .hero::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      filter:blur(18px);
+      opacity:.28;
+      pointer-events:none;
+    }
+
+    .hero::before{
+      width:220px;
+      height:220px;
+      right:-60px;
+      top:-70px;
+      background:rgba(255,255,255,.28);
+    }
+
+    .hero::after{
+      width:180px;
+      height:180px;
+      left:-50px;
+      bottom:-60px;
+      background:rgba(59,130,246,.30);
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:30px;
       line-height:1.25;
     }
-    .banner p{
+
+    .hero p{
       margin:0;
-      color:#cbd5e1;
-      font-size:15px;
+      max-width:860px;
+      line-height:1.7;
+      color:rgba(255,255,255,.95);
     }
+
     .layout{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1.4fr .9fr;
       gap:22px;
+      margin-top:22px;
     }
+
     .card{
       background:var(--card);
-      color:var(--text);
+      border:1px solid var(--line);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:24px;
+      overflow:hidden;
     }
-    .section-title{
-      margin:0 0 18px;
-      font-size:22px;
+
+    .card-head{
+      padding:22px 22px 10px;
+      border-bottom:1px solid #edf2f7;
+    }
+
+    .card-head h2{
+      margin:0;
+      font-size:24px;
+      color:#143a78;
+    }
+
+    .card-head p{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .card-body{
+      padding:22px;
+    }
+
+    .field{
+      margin-bottom:16px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:8px;
+      font-size:14px;
       font-weight:700;
-      color:var(--primary);
+      color:#163a63;
     }
-    .grid{
+
+    .req{color:#dc2626}
+
+    .row{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
     }
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-bottom:16px;
-    }
-    .field.full{
-      grid-column:1 / -1;
-    }
-    label{
-      font-weight:700;
-      font-size:14px;
-    }
-    .required{
-      color:var(--danger);
-    }
-    input, textarea{
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select{
       width:100%;
-      border:1px solid #cbd5e1;
-      border-radius:12px;
-      padding:14px 14px;
-      font-size:15px;
+      border:1px solid #cfdced;
+      border-radius:14px;
+      background:#fbfdff;
+      padding:13px 14px;
+      font-size:16px;
+      color:var(--text);
       outline:none;
       transition:.2s ease;
-      background:#fff;
-      color:#0f172a;
     }
-    input:focus, textarea:focus{
-      border-color:var(--primary2);
-      box-shadow:0 0 0 4px rgba(37,99,235,.12);
-    }
+
     textarea{
       min-height:120px;
       resize:vertical;
     }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+      border-color:#60a5fa;
+      box-shadow:0 0 0 4px rgba(59,130,246,.10);
+      background:#fff;
+    }
+
     .actions{
       display:flex;
       align-items:center;
-      gap:12px;
-      margin-top:8px;
+      gap:14px;
       flex-wrap:wrap;
+      margin-top:8px;
     }
-    button{
+
+    .btn{
       border:none;
-      border-radius:12px;
-      padding:14px 22px;
-      font-size:15px;
-      font-weight:700;
+      border-radius:16px;
+      min-height:52px;
+      padding:0 24px;
+      background:linear-gradient(135deg,#143a78 0%, #1d4ed8 75%, #2563eb 100%);
       color:#fff;
+      font-size:17px;
+      font-weight:800;
       cursor:pointer;
-      background:linear-gradient(135deg, var(--primary), var(--primary2));
+      box-shadow:0 14px 28px rgba(37,99,235,.20);
       transition:.2s ease;
     }
-    button:disabled{
-      opacity:.65;
-      cursor:not-allowed;
-    }
-    .status{
-      font-size:14px;
-      min-height:22px;
-      font-weight:700;
-    }
-    .status.ok{ color:var(--ok); }
-    .status.error{ color:var(--danger); }
-    .info-block{
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.04);
-      border-radius:18px;
-      padding:20px;
-      color:#e2e8f0;
-      line-height:1.7;
-    }
-    .info-block h3{
-      margin:0 0 12px;
-      color:#fff;
-      font-size:20px;
-    }
-    .mini{
-      font-size:14px;
-      color:#cbd5e1;
-    }
-    .loading{
-      display:inline-block;
-      width:18px;
-      height:18px;
-      border:2px solid rgba(255,255,255,.35);
-      border-top-color:#fff;
-      border-radius:50%;
-      animation:spin .8s linear infinite;
-      vertical-align:middle;
-      margin-right:8px;
-    }
-    @keyframes spin { to { transform:rotate(360deg); } }
 
-    @media (max-width: 900px){
-      .layout{ grid-template-columns:1fr; }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{
+      opacity:.75;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .msg{
+      min-height:24px;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.6;
+    }
+
+    .msg.ok{color:var(--success)}
+    .msg.err{color:var(--danger)}
+    .msg.wait{color:var(--warning)}
+
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid #f0d9a8;
+      background:#fff8eb;
+      color:#8a5606;
+      line-height:1.65;
+      font-size:13px;
+    }
+
+    .panel{
+      padding:16px;
+      border:1px solid #dbe8f5;
+      background:linear-gradient(180deg,#f9fbff,#f2f7fd);
+      border-radius:18px;
+      margin-bottom:14px;
+    }
+
+    .panel h3{
+      margin:0 0 8px;
+      color:#143a78;
+      font-size:18px;
+    }
+
+    .panel p, .panel li{
+      margin:0;
+      line-height:1.72;
+      color:#314861;
+      font-size:14px;
+    }
+
+    .panel ul{
+      margin:0;
+      padding-left:18px;
+    }
+
+    .footer{
+      text-align:center;
+      margin-top:20px;
+      padding:14px;
+      color:#3d5871;
+      font-weight:800;
+    }
+
+    iframe[name="hidden_iframe"]{
+      display:none;
+      width:0;
+      height:0;
+      border:none;
+    }
+
+    @media (max-width: 920px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    @media (max-width: 640px){
+      .container{padding:12px}
+      .hero h1{font-size:26px}
+      .row{grid-template-columns:1fr}
+      .card-head,.card-body{padding:16px}
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="banner">
-      <h1>Câu hỏi thực tiển đặt ra</h1>
-      <p>Công việc gặp thường xuyên</p>
-    </div>
+  <div class="container">
+    <section class="hero">
+      <h1>Phiếu nhập thông tin</h1>
+      <p>
+        Biểu mẫu dùng để tiếp nhận nội dung đăng ký, câu hỏi thực tế và lưu dữ liệu về Google Sheet
+        thông qua Google Apps Script Web App.
+      </p>
+    </section>
 
     <div class="layout">
-      <div class="card">
-        <h2 class="section-title">Phiếu nhập thông tin</h2>
-
-        <form id="answerForm" method="POST" target="hidden_iframe">
-          <input type="hidden" name="form_name" value="THU_THAP_CAU_TRA_LOI" />
-
-          <div class="grid">
-            <div class="field">
-              <label for="email_dang_ky">Email đăng ký <span class="required">*</span></label>
-              <input type="email" id="email_dang_ky" name="email_dang_ky" required placeholder="Nhập email đăng ký" />
-            </div>
-
-            <div class="field">
-              <label for="ten">Tên <span class="required">*</span></label>
-              <input type="text" id="ten" name="ten" required placeholder="Nhập họ và tên" />
-            </div>
-
-            <div class="field full">
-              <label for="don_vi">Đơn vị <span class="required">*</span></label>
-              <input type="text" id="don_vi" name="don_vi" required placeholder="Nhập tên đơn vị" />
-            </div>
-          </div>
-
-          <div id="questionContainer"></div>
-
-          <div class="actions">
-            <button type="submit" id="submitBtn">Gửi dữ liệu</button>
-            <div id="status" class="status"></div>
-          </div>
-        </form>
-
-        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-      </div>
-
-      <div class="info-block">
-        <h3>Hướng dẫn vận hành</h3>
-        <div class="mini">
-          1. Chỉ cần thay đổi nội dung tại sheet <b>CAU_HOI</b>, biểu mẫu sẽ tự cập nhật. <br>
-          2. Dữ liệu nộp vào được lưu tại sheet <b>TRA_LOI</b>. <br>
-          3. STT được sinh tự động ở phía máy chủ để tránh trùng lặp. <br>
-          4. Không sử dụng biểu mẫu này để thu thập nội dung thuộc phạm vi bí mật nhà nước.
+      <section class="card">
+        <div class="card-head">
+          <h2>Thông tin đăng ký</h2>
+          <p>Vui lòng nhập đầy đủ thông tin bắt buộc trước khi gửi dữ liệu.</p>
         </div>
-      </div>
+
+        <div class="card-body">
+          <form id="registerForm" method="post" target="hidden_iframe" novalidate>
+            <div class="row">
+              <div class="field">
+                <label for="emailDangKy">Email đăng ký <span class="req">*</span></label>
+                <input id="emailDangKy" name="emailDangKy" type="email" placeholder="Nhập email đăng ký" required />
+              </div>
+
+              <div class="field">
+                <label for="ten">Tên <span class="req">*</span></label>
+                <input id="ten" name="ten" type="text" placeholder="Nhập họ và tên" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="donVi">Đơn vị <span class="req">*</span></label>
+              <input id="donVi" name="donVi" type="text" placeholder="Nhập đơn vị công tác" required />
+            </div>
+
+            <div class="field">
+              <label for="cauHoi1">Câu hỏi số 1 <span class="req">*</span></label>
+              <textarea id="cauHoi1" name="cauHoi1" placeholder="Nhập nội dung câu hỏi số 1" required></textarea>
+            </div>
+
+            <div class="field">
+              <label for="cauHoi2">Câu hỏi số 2 <span class="req">*</span></label>
+              <textarea id="cauHoi2" name="cauHoi2" placeholder="Nhập nội dung câu hỏi số 2" required></textarea>
+            </div>
+
+            <div class="field">
+              <label for="cauHoi3">Câu hỏi số 3</label>
+              <textarea id="cauHoi3" name="cauHoi3" placeholder="Nhập nội dung câu hỏi số 3"></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn" id="btnSubmit">Gửi dữ liệu</button>
+              <div class="msg" id="submitMessage" aria-live="polite"></div>
+            </div>
+
+            <div class="note">
+              Dữ liệu sẽ được gửi đến Google Apps Script Web App và lưu vào Google Sheet.
+            </div>
+          </form>
+
+          <iframe name="hidden_iframe" id="hidden_iframe" title="Khung gửi dữ liệu ẩn"></iframe>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-head">
+          <h2>Kiểm tra cấu hình</h2>
+          <p>Danh mục rà soát nhanh khi phát sinh lỗi gửi dữ liệu.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="panel">
+            <h3>Nguyên nhân thường gặp</h3>
+            <ul>
+              <li>Apps Script chưa triển khai dạng Web App.</li>
+              <li>Quyền truy cập Web App chưa để “Anyone”.</li>
+              <li>URL Web App chưa đúng hoặc đang dùng bản deploy cũ.</li>
+              <li>Sheet đích hoặc tên tab không khớp với mã Apps Script.</li>
+              <li>Apps Script không trả về HTML có <strong>postMessage</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h3>Yêu cầu bắt buộc</h3>
+            <ul>
+              <li>Phải deploy lại sau mỗi lần sửa Code.gs.</li>
+              <li>HTML phải dùng đúng URL Web App bản mới nhất.</li>
+              <li>Header trong Google Sheet phải cố định, đúng thứ tự.</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
     </div>
+
+    <div class="footer">Product by ducanh.bkcit</div>
   </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySZDY6x0XCY6FgZivv5qVL1Hgned1w4nNO6FqM1ufNa8sW_Xgvn0XnjNgRcYAXV2xU/exec';
-    const CONFIG_URL = SCRIPT_URL + '?mode=config&_=' + Date.now();
-    const SUBMIT_TIMEOUT_MS = 30000;
+    const MESSAGE_SOURCE = 'AIA_2026_FORM';
+    const ALLOWED_SCRIPT_ORIGIN = 'https://script.google.com';
 
-    const form = document.getElementById('answerForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const statusEl = document.getElementById('status');
-    const questionContainer = document.getElementById('questionContainer');
+    const form = document.getElementById('registerForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const submitMessage = document.getElementById('submitMessage');
 
+    let submitPending = false;
     let submitTimeout = null;
-    let currentConfig = null;
 
-    function setStatus(message, type = '') {
-      statusEl.className = 'status' + (type ? ' ' + type : '');
-      statusEl.textContent = message || '';
+    function setMessage(type, text) {
+      submitMessage.className = 'msg';
+      if (type) submitMessage.classList.add(type);
+      submitMessage.textContent = text || '';
     }
 
-    function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function sanitize(value) {
+      return String(value || '').trim();
     }
 
     function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    function renderQuestions(config) {
-      if (!config || !config.ok || !Array.isArray(config.questions) || config.questions.length !== 3) {
-        questionContainer.innerHTML = '<div class="field full"><label>Lỗi cấu hình</label><input type="text" disabled value="Không tải được cấu hình 03 câu hỏi."></div>';
-        return;
+    function focusField(el) {
+      if (el && typeof el.focus === 'function') el.focus();
+    }
+
+    function validateForm() {
+      const emailDangKy = sanitize(form.emailDangKy.value);
+      const ten = sanitize(form.ten.value);
+      const donVi = sanitize(form.donVi.value);
+      const cauHoi1 = sanitize(form.cauHoi1.value);
+      const cauHoi2 = sanitize(form.cauHoi2.value);
+
+      if (!SCRIPT_URL || !SCRIPT_URL.includes('script.google.com/macros/s/')) {
+        setMessage('err', 'Chưa cấu hình đúng đường dẫn Apps Script Web App.');
+        return false;
       }
 
-      currentConfig = config;
-      let html = '';
-
-      config.questions.forEach((q, index) => {
-        const answerName = `tra_loi_${index + 1}`;
-        const requiredMark = q.required ? '<span class="required">*</span>' : '';
-        const requiredAttr = q.required ? 'required' : '';
-
-        html += `
-          <div class="field full">
-            <label for="${answerName}">${escapeHtml(q.text)} ${requiredMark}</label>
-            <textarea id="${answerName}" name="${answerName}" ${requiredAttr}
-              placeholder="${escapeHtml(q.placeholder || 'Nhập câu trả lời')}"></textarea>
-          </div>
-        `;
-      });
-
-      questionContainer.innerHTML = html;
-    }
-
-    function loadConfig() {
-      setStatus('Đang tải cấu hình câu hỏi...', '');
-      const oldScript = document.getElementById('dynamic-config-script');
-      if (oldScript) oldScript.remove();
-
-      const script = document.createElement('script');
-      script.id = 'dynamic-config-script';
-      script.src = CONFIG_URL;
-      script.onerror = function() {
-        setStatus('Không tải được cấu hình câu hỏi từ máy chủ.', 'error');
-      };
-      document.body.appendChild(script);
-    }
-
-    window.addEventListener('dynamic-form-config-loaded', function() {
-      try {
-        renderQuestions(window.__FORM_CONFIG__);
-        setStatus('Đã tải cấu hình câu hỏi.', 'ok');
-      } catch (err) {
-        setStatus('Có lỗi khi hiển thị câu hỏi.', 'error');
+      if (!emailDangKy) {
+        setMessage('err', 'Vui lòng nhập Email đăng ký.');
+        focusField(form.emailDangKy);
+        return false;
       }
-    });
 
-    window.addEventListener('message', function(event) {
-      const data = event.data || {};
-      if (data.type !== 'FORM_SUBMIT_RESULT') return;
+      if (!validateEmail(emailDangKy)) {
+        setMessage('err', 'Email đăng ký chưa đúng định dạng.');
+        focusField(form.emailDangKy);
+        return false;
+      }
+
+      if (!ten) {
+        setMessage('err', 'Vui lòng nhập Tên.');
+        focusField(form.ten);
+        return false;
+      }
+
+      if (!donVi) {
+        setMessage('err', 'Vui lòng nhập Đơn vị.');
+        focusField(form.donVi);
+        return false;
+      }
+
+      if (!cauHoi1) {
+        setMessage('err', 'Vui lòng nhập Câu hỏi số 1.');
+        focusField(form.cauHoi1);
+        return false;
+      }
+
+      if (!cauHoi2) {
+        setMessage('err', 'Vui lòng nhập Câu hỏi số 2.');
+        focusField(form.cauHoi2);
+        return false;
+      }
+
+      form.emailDangKy.value = emailDangKy;
+      form.ten.value = ten;
+      form.donVi.value = donVi;
+      form.cauHoi1.value = cauHoi1;
+      form.cauHoi2.value = cauHoi2;
+      form.cauHoi3.value = sanitize(form.cauHoi3.value);
+
+      return true;
+    }
+
+    function beginSubmitting() {
+      submitPending = true;
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Đang gửi dữ liệu...';
+      setMessage('wait', 'Hệ thống đang gửi dữ liệu, vui lòng chờ...');
 
       clearTimeout(submitTimeout);
-      submitBtn.disabled = false;
+      submitTimeout = setTimeout(() => {
+        if (!submitPending) return;
+        endSubmitting();
+        setMessage('err', 'Hết thời gian chờ phản hồi từ máy chủ. Đề nghị kiểm tra lại cấu hình Apps Script Web App.');
+      }, 30000);
+    }
 
-      if (data.ok) {
-        setStatus(data.message || 'Gửi dữ liệu thành công.', 'ok');
-        form.reset();
-      } else {
-        setStatus(data.message || 'Gửi dữ liệu thất bại.', 'error');
-      }
-    });
+    function endSubmitting() {
+      submitPending = false;
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Gửi dữ liệu';
+      clearTimeout(submitTimeout);
+    }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e){
       e.preventDefault();
 
-      const email = document.getElementById('email_dang_ky').value.trim();
-      const ten = document.getElementById('ten').value.trim();
-      const donVi = document.getElementById('don_vi').value.trim();
-
-      if (!email || !validateEmail(email)) {
-        setStatus('Email đăng ký không hợp lệ.', 'error');
-        return;
-      }
-      if (!ten) {
-        setStatus('Chưa nhập Tên.', 'error');
-        return;
-      }
-      if (!donVi) {
-        setStatus('Chưa nhập Đơn vị.', 'error');
-        return;
-      }
-
-      if (!currentConfig || !currentConfig.questions || currentConfig.questions.length !== 3) {
-        setStatus('Chưa có cấu hình câu hỏi hợp lệ.', 'error');
-        return;
-      }
-
-      for (let i = 0; i < currentConfig.questions.length; i++) {
-        const q = currentConfig.questions[i];
-        const answerEl = document.getElementById(`tra_loi_${i + 1}`);
-        const value = (answerEl && answerEl.value || '').trim();
-        if (q.required && !value) {
-          setStatus(`Chưa nhập câu trả lời bắt buộc: ${q.text}`, 'error');
-          return;
-        }
-      }
-
-      submitBtn.disabled = true;
-      setStatus('Đang gửi dữ liệu...', '');
+      if (submitPending) return;
+      if (!validateForm()) return;
 
       form.action = SCRIPT_URL;
-      form.method = 'POST';
-      form.target = 'hidden_iframe';
+      beginSubmitting();
       form.submit();
-
-      submitTimeout = setTimeout(function() {
-        submitBtn.disabled = false;
-        setStatus('Hết thời gian chờ phản hồi từ máy chủ. Đề nghị kiểm tra lại cấu hình.', 'error');
-      }, SUBMIT_TIMEOUT_MS);
     });
 
-    loadConfig();
+    window.addEventListener('message', function(event){
+      if (
+        event.origin !== ALLOWED_SCRIPT_ORIGIN &&
+        event.origin !== 'https://script.googleusercontent.com'
+      ) {
+        return;
+      }
+
+      const data = event.data || {};
+      if (data.source !== MESSAGE_SOURCE) return;
+
+      endSubmitting();
+
+      if (data.success) {
+        form.reset();
+        setMessage('ok', data.message || 'Gửi dữ liệu thành công.');
+      } else {
+        setMessage('err', data.message || 'Có lỗi xảy ra khi gửi dữ liệu.');
+      }
+    });
   </script>
 </body>
 </html>
