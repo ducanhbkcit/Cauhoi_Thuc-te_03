@@ -10,7 +10,7 @@
       --bg1:#f4f8ff;
       --bg2:#eaf1fb;
       --card:#ffffff;
-      --line:#d7e3f1;
+      --line:#d8e3f2;
       --text:#17324d;
       --muted:#5b7188;
       --primary:#1d4ed8;
@@ -151,8 +151,7 @@
 
     input[type="text"],
     input[type="email"],
-    textarea,
-    select{
+    textarea{
       width:100%;
       border:1px solid #cfdced;
       border-radius:14px;
@@ -170,8 +169,7 @@
     }
 
     input:focus,
-    textarea:focus,
-    select:focus{
+    textarea:focus{
       border-color:#60a5fa;
       box-shadow:0 0 0 4px rgba(59,130,246,.10);
       background:#fff;
@@ -286,8 +284,7 @@
     <section class="hero">
       <h1>Phiếu nhập thông tin</h1>
       <p>
-        Biểu mẫu dùng để tiếp nhận nội dung đăng ký, câu hỏi thực tế và lưu dữ liệu về Google Sheet
-        thông qua Google Apps Script Web App.
+        Biểu mẫu dùng để tiếp nhận nội dung đăng ký, câu hỏi thực tế 
       </p>
     </section>
 
@@ -356,20 +353,16 @@
           <div class="panel">
             <h3>Nguyên nhân thường gặp</h3>
             <ul>
-              <li>Apps Script chưa triển khai dạng Web App.</li>
-              <li>Quyền truy cập Web App chưa để “Anyone”.</li>
-              <li>URL Web App chưa đúng hoặc đang dùng bản deploy cũ.</li>
-              <li>Sheet đích hoặc tên tab không khớp với mã Apps Script.</li>
-              <li>Apps Script không trả về HTML có <strong>postMessage</strong>.</li>
+              <li>Đồng hành, sẻ chia, phát triển</li>
+             
             </ul>
           </div>
 
           <div class="panel">
             <h3>Yêu cầu bắt buộc</h3>
             <ul>
-              <li>Phải deploy lại sau mỗi lần sửa Code.gs.</li>
-              <li>HTML phải dùng đúng URL Web App bản mới nhất.</li>
-              <li>Header trong Google Sheet phải cố định, đúng thứ tự.</li>
+              
+              <li>Hãy viết ra những gì mình chưa rõ để sửa lại hiệu quả cao hơn</li>
             </ul>
           </div>
         </div>
@@ -382,7 +375,6 @@
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySZDY6x0XCY6FgZivv5qVL1Hgned1w4nNO6FqM1ufNa8sW_Xgvn0XnjNgRcYAXV2xU/exec';
     const MESSAGE_SOURCE = 'AIA_2026_FORM';
-    const ALLOWED_SCRIPT_ORIGIN = 'https://script.google.com';
 
     const form = document.getElementById('registerForm');
     const btnSubmit = document.getElementById('btnSubmit');
@@ -500,13 +492,6 @@
     });
 
     window.addEventListener('message', function(event){
-      if (
-        event.origin !== ALLOWED_SCRIPT_ORIGIN &&
-        event.origin !== 'https://script.googleusercontent.com'
-      ) {
-        return;
-      }
-
       const data = event.data || {};
       if (data.source !== MESSAGE_SOURCE) return;
 
